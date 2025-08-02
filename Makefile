@@ -3,6 +3,8 @@ all: native
 
 UNAME_OS := $(shell uname -s)
 
+GRAAL_BUILD_ARGS += --initialize-at-build-time=org.slf4j.simple.SimpleLoggerFactory
+
 ifeq ($(UNAME_OS),Darwin)
 GRAAL_BUILD_ARGS += -H:-CheckToolchain
 endif

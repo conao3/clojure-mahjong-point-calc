@@ -3,7 +3,7 @@
   (:require
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
-   [mahjong-point-calc.core :as c.core]))
+   [mahjong-point-calc.system :as c.system]))
 
 (declare commands)
 
@@ -17,7 +17,7 @@
 (defn cmd-serve
   "Serve skkjure server"
   [& _args]
-  (let [system (-> (c.core/new-system)
+  (let [system (-> (c.system/new-system)
                    component/start-system)]
     (-> (Runtime/getRuntime)
         (.addShutdownHook (Thread. (fn []
