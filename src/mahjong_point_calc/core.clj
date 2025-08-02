@@ -9,17 +9,20 @@
    :headers {"Content-Type" "text/html"}
    :body    "hello HTTP!"})
 
-(defrecord Server [server handler]
+(defrecord Server [handler server server-stop-fn]
   component/Lifecycle
   (start [this]
     (log/info "Starting Server...")
-    (let [server (httpkit.server/run-server handler)]
-      (log/info "Started Server")
-      (assoc this :server server)))
+    (let [ret (httpkit.server/run-server handler {:port 0})
+          server (:server (meta ret))]
+      (log/infof "Started Server at port: %d" (httpkit.server/server-port server))
+      (->  this
+           (assoc :server server)
+           (assoc :server-stop-fn ret))))
 
   (stop [this]
     (log/info "Stopping Server...")
-    (server :timeout 1000)
+    (server-stop-fn :timeout 1000)
     (log/info "Stopped Server")
     (assoc this :server nil)))
 
