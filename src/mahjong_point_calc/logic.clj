@@ -115,6 +115,13 @@
          (keep (fn [[pair matrix]]
                  (when (->> matrix (every? (partial every? zero?))) pair))))))
 
+(mx/defn get-available-kotsu :- [:seqable c.schema/tile]
+  [tiles :- [:seqable c.schema/tile]]
+  (for [[i counts] (map-indexed vector (mahjong-point-calc.logic/tiles->matrix tiles))
+        [j count] (map-indexed vector counts)
+        _ (range (quot count 3))]
+    (mahjong-point-calc.logic/inx->tile i j)))
+
 ;; (mx/defn get-all-available-mentsu :- [:seqable c.schema/tile]
 ;;   [hand :- c.schema/hand
 ;;    win-tile :- c.schema/tile]

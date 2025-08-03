@@ -55,3 +55,19 @@
                c.logic/parse-tiles
                c.logic/get-available-pair
                c.logic/sort-tiles))))
+
+(t/deftest get-available-kotsu-test
+  (t/is (= []
+           (-> "55677m23466p567s"
+               c.logic/parse-tiles
+               c.logic/get-available-kotsu)))
+
+  (t/is (= [:5m :6m]
+           (-> "55677m23466p567s555m666m"
+               c.logic/parse-tiles
+               c.logic/get-available-kotsu)))
+
+  (t/is (= [:5m :5m :6m]
+           (-> "55677m23466p567s555m666m555m"
+               c.logic/parse-tiles
+               c.logic/get-available-kotsu))))
