@@ -19,7 +19,7 @@
          :main-opts ["-m" "nrepl.cmdline"
                      "--interactive"
                      "--middleware" "[cider.nrepl/cider-middleware]"]}
-  :test {:main-opts ["-e" "(require 'test)"
+  :test {:main-opts ["-e" "(require 'dev)"
                      "-m" "kaocha.runner"]}
   :build {:extra-deps {io.github.clojure/tools.build {:mvn/version "0.10.9"}}
           :ns-default build}}}
