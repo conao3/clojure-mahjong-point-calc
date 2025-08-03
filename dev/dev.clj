@@ -9,8 +9,11 @@
 
 (apply require clojure.main/repl-requires)
 
+(set! *warn-on-reflection* true)
+
 (component.repl/set-init (fn [_] (c.system/new-system)))
-(malli.dev/start! {:report (malli.dev.pretty/reporter
+
+(malli.dev/start! {:report (malli.dev.pretty/thrower
                             (malli.dev.pretty/-printer
                              {:colors
                               ;; default: malli.dev.virhe.-dark-colors
