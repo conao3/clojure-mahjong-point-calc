@@ -18,3 +18,14 @@
        (map-indexed (fn [inx val] [inx val]))
        (filter (fn [[_ val]] (= (access-fn val) value)))
        first))
+
+(mx/defn lpartial :- [:=> [:cat :any] :any]
+  [f :- ifn?
+   & args :- [:* :any]]
+  (fn [x]
+    (apply f x args)))
+
+(mx/defn power-set :- [:seqable [:seqable :any]]
+  [coll :- [:seqable :any]]
+  (->> coll
+       (reduce (fn [acc x] (into acc (map (lpartial conj x) acc))) [[]])))
