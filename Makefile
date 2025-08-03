@@ -4,6 +4,7 @@ all: native
 UNAME_OS := $(shell uname -s)
 
 GRAAL_BUILD_ARGS += --initialize-at-build-time=org.slf4j.simple.SimpleLoggerFactory
+GRAAL_BUILD_ARGS += -H:IncludeResources='mahjong-point-calc/.*'
 
 ifeq ($(UNAME_OS),Darwin)
 GRAAL_BUILD_ARGS += -H:-CheckToolchain

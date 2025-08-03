@@ -3,7 +3,8 @@
   (:require
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
-   [mahjong-point-calc.system :as c.system]))
+   [mahjong-point-calc.system :as c.system]
+   [mahjong-point-calc.logging :as c.logging]))
 
 (declare commands)
 
@@ -39,6 +40,7 @@
                :help #'cmd-help})
 
 (defn -main [& args]
+  (c.logging/init-logging)
   (if-let [command (get commands (keyword (first args)))]
     (apply command args)
     (do
