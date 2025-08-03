@@ -1,4 +1,4 @@
-(ns mahjong-point-calc.system.server 
+(ns mahjong-point-calc.system.server
   (:require
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]
