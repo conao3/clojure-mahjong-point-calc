@@ -21,6 +21,11 @@
    {:char \8 :value 8}
    {:char \9 :value 9}])
 
+(mx/defn inx->tile :- c.schema/tile
+  [t :- :int
+   n :- :int]
+  (keyword (str (inc n) (-> (nth tile-types t) :char))))
+
 (mx/defn tile-info :- [:map
                        [:type c.schema/tile-type]
                        [:number :int]]
@@ -73,6 +78,13 @@
                  (let [inxes (tile-inxes val)]
                    (update-in acc ((juxt :type :number) inxes) (fnil inc 0))))
                (into [] (repeat 4 (into [] (repeat 9 0)))))))
+
+(mx/defn matrix->tiles :- [:seqable c.schema/tile]
+  [matrix :- `[:tuple ~@(repeat 4 tile-counts)]]
+  (for [[i counts] (map-indexed vector matrix)
+        [j count] (map-indexed vector counts)
+        _ (range count)]
+    (inx->tile i j)))
 
 (mx/defn get-available-pair :- [:seqable c.schema/tile]
   [tiles :- [:seqable c.schema/tile]]

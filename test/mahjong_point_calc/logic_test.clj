@@ -33,6 +33,17 @@
                c.logic/parse-tiles
                c.logic/tiles->matrix))))
 
+(t/deftest matrix->tiles-test
+  (t/is (= (-> "55677m23466p567s6m"
+               c.logic/parse-tiles
+               c.logic/sort-tiles)
+           (-> [[0 0 0 0 2 2 2 0 0]
+                [0 1 1 1 0 2 0 0 0]
+                [0 0 0 0 1 1 1 0 0]
+                [0 0 0 0 0 0 0 0 0]]
+               c.logic/matrix->tiles
+               c.logic/sort-tiles))))
+
 (t/deftest get-available-pairs-test
   (t/is (= [:6p]
            (-> "55677m23466p567s6m"
