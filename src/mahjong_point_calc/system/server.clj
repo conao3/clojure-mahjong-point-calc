@@ -13,9 +13,9 @@
                {:port (:server/port (:config config))})
           server (:server (meta ret))]
       (log/info "Started Server at port:" (httpkit.server/server-port server))
-      (->  this
-           (assoc :server server)
-           (assoc :server-stop-fn ret))))
+      (-> this
+          (assoc :server server)
+          (assoc :server-stop-fn ret))))
 
   (stop [this]
     (log/info "Stopping Server...")
