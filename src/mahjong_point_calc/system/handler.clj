@@ -3,10 +3,10 @@
    [clojure.tools.logging :as log]
    [com.stuartsierra.component :as component]))
 
-(defn handler [req]
-  {:status  200
+(defn handler [_req]
+  {:status 200
    :headers {"Content-Type" "text/html"}
-   :body    "hello HTTP!"})
+   :body "hello HTTP!"})
 
 (defrecord Handler [handler]
   component/Lifecycle
