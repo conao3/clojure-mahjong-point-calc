@@ -24,11 +24,23 @@
   (t/is (= [:5m :2s :8m :1m :5m :1z]
            (c.logic/parse-tiles "5m2s815m1z"))))
 
-(t/deftest count-tiles-test
+(t/deftest tiles->matrix-test
   (t/is (= [[0 0 0 0 2 2 2 0 0]
             [0 1 1 1 0 2 0 0 0]
             [0 0 0 0 1 1 1 0 0]
             [0 0 0 0 0 0 0 0 0]]
            (-> "55677m23466p567s6m"
                c.logic/parse-tiles
-               c.logic/count-tiles))))
+               c.logic/tiles->matrix))))
+
+(t/deftest get-available-pairs-test
+  (t/is (= [:6p]
+           (-> "55677m23466p567s6m"
+               c.logic/parse-tiles
+               c.logic/get-available-pair)))
+
+  (t/is (= [:2m :5m]
+           (-> "2234455m234s234p3m"
+               c.logic/parse-tiles
+               c.logic/get-available-pair
+               c.logic/sort-tiles))))
