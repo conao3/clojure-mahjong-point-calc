@@ -7,17 +7,15 @@
    access-fn :- ifn?
    value :- :any]
   (->> coll
-       (filter #(= (access-fn %) value))
-       first))
+       (some #(when (= (access-fn %) value) %))))
 
 (mx/defn find-value-index :- [:maybe [:tuple :int :any]]
   [coll :- [:seqable :any]
    access-fn :- ifn?
    value :- :any]
   (->> coll
-       (map-indexed (fn [inx val] [inx val]))
-       (filter (fn [[_ val]] (= (access-fn val) value)))
-       first))
+       (map-indexed vector)
+       (some (fn [[inx val]] (when (= (access-fn val) value) [inx val])))))
 
 (mx/defn lpartial :- [:=> [:cat :any] :any]
   [f :- ifn?
