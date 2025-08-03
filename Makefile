@@ -18,6 +18,14 @@ repl:
 test:
 	clojure -M:dev:test
 
+.PHONY: lint
+lint:
+	clj-kondo --lint src
+
+.PHONY: fetch-lint-config
+fetch-lint-config:
+	clj-kondo --lint "$$(clojure -Spath)" --copy-configs --skip-lint
+
 .PHONY: uber
 uber: target/mahjong-point-calc-standalone.jar
 
