@@ -1,40 +1,33 @@
 (ns mahjong-point-calc.logic
   (:require
-   [malli.experimental :as mx]
-   [mahjong-point-calc.schema :as c.schema]))
+   [mahjong-point-calc.schema :as c.schema]
+   [mahjong-point-calc.util :as c.util]
+   [malli.experimental :as mx]))
 
-(def char->number
-  {\1 1
-   \2 2
-   \3 3
-   \4 4
-   \5 5
-   \6 6
-   \7 7
-   \8 8
-   \9 9})
+(def number-types
+  [{:char \1 :value 1}
+   {:char \2 :value 2}
+   {:char \3 :value 3}
+   {:char \4 :value 4}
+   {:char \5 :value 5}
+   {:char \6 :value 6}
+   {:char \7 :value 7}
+   {:char \8 :value 8}
+   {:char \9 :value 9}])
 
-(def number->char (->> char->number
-                       (map (fn [[k v]] [v k]))
-                       (into {})))
-
-(def char->tile-type
-  {\m c.schema/tile-type-manzu
-   \p c.schema/tile-type-pinzu
-   \s c.schema/tile-type-souzu
-   \z c.schema/tile-type-jihai})
-
-(def tile-type->char (->> char->tile-type
-                          (map (fn [[k v]] [v k]))
-                          (into {})))
+(def tile-types
+  [{:char \m :value c.schema/tile-type-manzu}
+   {:char \p :value c.schema/tile-type-pinzu}
+   {:char \s :value c.schema/tile-type-souzu}
+   {:char \z :value c.schema/tile-type-jihai}])
 
 (mx/defn tile-info :- [:map
                        [:num :int]
                        [:type c.schema/tile-type]]
   [tile :- c.schema/tile]
   (let [[n t] (name tile)]
-    {:num (char->number n)
-     :type (char->tile-type t)}))
+    {:num (-> (c.util/find-value number-types :char n) :value)
+     :type (-> (c.util/find-value tile-types :char t) :value)}))
 
 (mx/defn sort-tiles :- [:seqable c.schema/tile]
   [tiles :- [:vector c.schema/tile]]

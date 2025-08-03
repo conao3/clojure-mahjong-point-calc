@@ -4,14 +4,6 @@
    [mahjong-point-calc.logic :as c.logic]
    [mahjong-point-calc.schema :as c.schema]))
 
-(t/deftest char->number-test
-  (t/is (= 1 (c.logic/char->number \1)))
-  (t/is (= 3 (c.logic/char->number \3))))
-
-(t/deftest char->tile-type-test
-  (t/is (= c.schema/tile-type-manzu (c.logic/char->tile-type \m)))
-  (t/is (= c.schema/tile-type-jihai (c.logic/char->tile-type \z))))
-
 (t/deftest tile-info-test
   (t/is (= {:num 1
             :type c.schema/tile-type-manzu}
