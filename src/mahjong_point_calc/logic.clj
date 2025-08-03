@@ -30,13 +30,13 @@
 
 (mx/defn tile-info :- [:map
                        [:num :int]
-                       [:type c.schema/meld-type]]
+                       [:type c.schema/tile-type]]
   [tile :- c.schema/tile]
   (let [[n t] (name tile)]
     {:num (char->number n)
      :type (char->tile-type t)}))
 
-(mx/defn sort-tiles :- [:vector c.schema/tile]
+(mx/defn sort-tiles :- [:seqable c.schema/tile]
   [tiles :- [:vector c.schema/tile]]
   (let [type-order {c.schema/tile-type-manzu 0
                     c.schema/tile-type-pinzu 1
@@ -46,7 +46,7 @@
          (sort-by #(let [info (tile-info %)]
                      [(type-order (:type info)) (:num info)])))))
 
-(mx/defn parse-tiles :- [:vector c.schema/tile]
+(mx/defn parse-tiles :- [:seqable c.schema/tile]
   [inpt :- :string]
   (loop [result []
          nums []
