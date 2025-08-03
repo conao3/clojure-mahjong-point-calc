@@ -76,8 +76,8 @@
   (->> tiles
        (reduce (fn [acc val]
                  (let [inxes (tile-inxes val)]
-                   (update-in acc ((juxt :type :number) inxes) (fnil inc 0))))
-               (into [] (repeat 4 (into [] (repeat 9 0)))))))
+                   (update-in acc ((juxt :type :number) inxes) inc)))
+               (vec (repeat 4 (vec (repeat 9 0)))))))
 
 (mx/defn matrix->tiles :- [:seqable c.schema/tile]
   [matrix :- `[:tuple ~@(repeat 4 tile-counts)]]
