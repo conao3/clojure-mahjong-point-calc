@@ -4,6 +4,12 @@
    [mahjong-point-calc.util :as c.util]
    [malli.experimental :as mx]))
 
+(def tile-types
+  [{:char \m :value c.schema/tile-type-manzu}
+   {:char \p :value c.schema/tile-type-pinzu}
+   {:char \s :value c.schema/tile-type-souzu}
+   {:char \z :value c.schema/tile-type-jihai}])
+
 (def number-types
   [{:char \1 :value 1}
    {:char \2 :value 2}
@@ -15,19 +21,21 @@
    {:char \8 :value 8}
    {:char \9 :value 9}])
 
-(def tile-types
-  [{:char \m :value c.schema/tile-type-manzu}
-   {:char \p :value c.schema/tile-type-pinzu}
-   {:char \s :value c.schema/tile-type-souzu}
-   {:char \z :value c.schema/tile-type-jihai}])
-
 (mx/defn tile-info :- [:map
-                       [:num :int]
-                       [:type c.schema/tile-type]]
+                       [:type c.schema/tile-type]
+                       [:number :int]]
   [tile :- c.schema/tile]
   (let [[n t] (name tile)]
-    {:num (-> (c.util/find-value number-types :char n) :value)
-     :type (-> (c.util/find-value tile-types :char t) :value)}))
+    {:type (-> (c.util/find-value tile-types :char t) :value)
+     :number (-> (c.util/find-value number-types :char n) :value)}))
+
+(mx/defn tile-inxes :- [:map
+                        [:type :int]
+                        [:number :int]]
+  [tile :- c.schema/tile]
+  (let [[n t] (name tile)]
+    {:type (-> (c.util/find-value-index tile-types :char t) first)
+     :number (-> (c.util/find-value-index number-types :char n) first)}))
 
 (mx/defn sort-tiles :- [:seqable c.schema/tile]
   [tiles :- [:vector c.schema/tile]]
@@ -37,7 +45,7 @@
                     c.schema/tile-type-jihai 3}]
     (->> tiles
          (sort-by #(let [info (tile-info %)]
-                     [(type-order (:type info)) (:num info)])))))
+                     [(type-order (:type info)) (:number info)])))))
 
 (mx/defn parse-tiles :- [:seqable c.schema/tile]
   [inpt :- :string]
@@ -55,6 +63,16 @@
                  []
                  (next inpt))))
       result)))
+
+(def tile-counts `[:tuple ~@(repeat 9 :int)])
+
+(mx/defn count-tiles :- `[:tuple ~@(repeat 4 tile-counts)]
+  [tiles :- [:seqable c.schema/tile]]
+  (->> tiles
+       (reduce (fn [acc val]
+                 (let [inxes (tile-inxes val)]
+                   (update-in acc ((juxt :type :number) inxes) (fnil inc 0))))
+               (into [] (repeat 4 (into [] (repeat 9 0)))))))
 
 ;; (mx/defn get-all-available-mentsu :- [:vector c.schema/tile]
 ;;   [hand :- c.schema/hand

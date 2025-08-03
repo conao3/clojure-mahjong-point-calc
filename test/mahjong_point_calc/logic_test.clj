@@ -5,11 +5,11 @@
    [mahjong-point-calc.schema :as c.schema]))
 
 (t/deftest tile-info-test
-  (t/is (= {:num 1
+  (t/is (= {:number 1
             :type c.schema/tile-type-manzu}
            (c.logic/tile-info :1m)))
 
-  (t/is (= {:num 4
+  (t/is (= {:number 4
             :type c.schema/tile-type-jihai}
            (c.logic/tile-info :4z))))
 
@@ -23,3 +23,12 @@
 
   (t/is (= [:5m :2s :8m :1m :5m :1z]
            (c.logic/parse-tiles "5m2s815m1z"))))
+
+(t/deftest count-tiles-test
+  (t/is (= [[0 0 0 0 2 2 2 0 0]
+            [0 1 1 1 0 2 0 0 0]
+            [0 0 0 0 1 1 1 0 0]
+            [0 0 0 0 0 0 0 0 0]]
+           (-> "55677m23466p567s6m"
+               c.logic/parse-tiles
+               c.logic/count-tiles))))
