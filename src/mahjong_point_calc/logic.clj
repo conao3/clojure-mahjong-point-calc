@@ -88,32 +88,33 @@
 
 (mx/defn get-available-pair :- [:seqable c.schema/tile]
   [tiles :- [:seqable c.schema/tile]]
-  (let [tile-matrix (tiles->matrix tiles)]
-    (->> tiles
-         frequencies
-         (keep (fn [[k v]] (when (<= 2 v) k)))
-         (map (fn [candidate]
-                (let [inxes (tile-inxes candidate)
-                      matrix (atom (update-in tile-matrix ((juxt :type :number) inxes) - 2))]
-                  ;; m, p, sは刻子と順子を構成する
-                  (doseq [i (range 3)]
-                    (doseq [j (range 9)]
-                      (let [cnt (get-in @matrix [i j])]
-                        (when (pos? cnt)
-                          ;; まず対象の牌を0にする
-                          ;; mod 3した数を次と次の次の牌から引く
-                          ;; まず刻子を抜き出した後、順子を抜き出す操作に相当する
-                          (swap! matrix assoc-in [i j] 0)
-                          (swap! matrix update-in [i (inc j)] - (mod cnt 3))
-                          (swap! matrix update-in [i (inc (inc j))] - (mod cnt 3))))))
-                  ;; zは刻子のみ
-                  (let [i 3]
-                    (doseq [j (range 9)]
-                      (when (pos? (get-in @matrix [i j]))
-                        (swap! matrix update-in [i j] mod 3))))
-                  [candidate @matrix])))
-         (keep (fn [[pair matrix]]
-                 (when (->> matrix (every? (partial every? zero?))) pair))))))
+  (->> tiles
+       frequencies
+       (keep (fn [[k v]] (when (<= 2 v) k)))
+       (map (fn [candidate]
+              (let [matrix (-> tiles
+                               tiles->matrix
+                               (update-in ((juxt :type :number) (tile-inxes candidate)) - 2)
+                               atom)]
+                ;; m, p, sは刻子と順子を構成する
+                (doseq [i (range 3)
+                        j (range 7)]     ; 8, 9, 10の順子は構成できない
+                  (let [cnt (get-in @matrix [i j])]
+                    (when (pos? cnt)
+                      ;; まず対象の牌を0にする
+                      ;; mod 3した数を次と次の次の牌から引く
+                      ;; まず刻子を抜き出した後、順子を抜き出す操作に相当する
+                      (swap! matrix assoc-in [i j] 0)
+                      (swap! matrix update-in [i (inc j)] - (mod cnt 3))
+                      (swap! matrix update-in [i (inc (inc j))] - (mod cnt 3)))))
+                ;; zは刻子のみ
+                (let [i 3]
+                  (doseq [j (range 9)]
+                    (when (pos? (get-in @matrix [i j]))
+                      (swap! matrix update-in [i j] mod 3))))
+                [candidate @matrix])))
+       (keep (fn [[pair matrix]]
+               (when (->> matrix (every? (partial every? zero?))) pair)))))
 
 (mx/defn get-available-kotsu :- [:seqable c.schema/tile]
   [tiles :- [:seqable c.schema/tile]]
