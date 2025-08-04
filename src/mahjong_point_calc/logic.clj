@@ -116,12 +116,35 @@
        (keep (fn [[pair matrix]]
                (when (->> matrix (every? (partial every? zero?))) pair)))))
 
-(mx/defn get-available-kotsu :- [:seqable c.schema/tile]
+(mx/defn get-available-kotsu :- [:seqable [:seqable c.schema/tile]]
   [tiles :- [:seqable c.schema/tile]]
-  (for [[i counts] (map-indexed vector (mahjong-point-calc.logic/tiles->matrix tiles))
-        [j count] (map-indexed vector counts)
-        _ (range (quot count 3))]
-    (mahjong-point-calc.logic/inx->tile i j)))
+  (->> tiles
+       frequencies
+       (keep (fn [[k v]] (when (<= 3 v) [k (quot v 3)])))
+       (mapcat (fn [[k n]] (repeat n k)))
+       c.util/power-set
+       (map sort-tiles)
+       (map (fn [candidate-lst]
+              (let [matrix (->> candidate-lst
+                                (reduce
+                                 (fn [acc val]
+                                   (-> acc (update-in ((juxt :type :number) (tile-inxes val)) - 3)))
+                                 (tiles->matrix tiles))
+                                atom)]
+                ;; m, p, sは順子を構成する
+                (doseq [i (range 3)
+                        j (range 7)]     ; 8, 9, 10の順子は構成できない
+                  (let [cnt (get-in @matrix [i j])]
+                    (when (pos? cnt)
+                      ;; まず対象の牌を0にする
+                      ;; その数を次と次の次の牌から引く
+                      ;; 順子を抜き出す操作に相当する
+                      (swap! matrix assoc-in [i j] 0)
+                      (swap! matrix update-in [i (inc j)] - cnt)
+                      (swap! matrix update-in [i (inc (inc j))] - cnt))))
+                [candidate-lst @matrix])))
+       (keep (fn [[candidate-lst matrix]]
+               (when (->> matrix (every? (partial every? zero?))) candidate-lst)))))
 
 ;; (mx/defn get-all-available-mentsu :- [:seqable c.schema/tile]
 ;;   [hand :- c.schema/hand
