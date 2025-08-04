@@ -92,27 +92,31 @@
        frequencies
        (keep (fn [[k v]] (when (<= 2 v) k)))
        (map (fn [candidate]
-              (let [matrix (-> tiles
-                               tiles->matrix
-                               (update-in ((juxt :type :number) (tile-inxes candidate)) - 2)
-                               atom)]
-                ;; m, p, sは刻子と順子を構成する
-                (doseq [i (range 3)
-                        j (range 7)]     ; 8, 9, 10の順子は構成できない
-                  (let [cnt (get-in @matrix [i j])]
-                    (when (pos? cnt)
-                      ;; まず対象の牌を0にする
-                      ;; mod 3した数を次と次の次の牌から引く
-                      ;; まず刻子を抜き出した後、順子を抜き出す操作に相当する
-                      (swap! matrix assoc-in [i j] 0)
-                      (swap! matrix update-in [i (inc j)] - (mod cnt 3))
-                      (swap! matrix update-in [i (inc (inc j))] - (mod cnt 3)))))
-                ;; zは刻子のみ
-                (let [i 3]
-                  (doseq [j (range 9)]
-                    (when (pos? (get-in @matrix [i j]))
-                      (swap! matrix update-in [i j] mod 3))))
-                [candidate @matrix])))
+              [candidate
+               (-> tiles
+                   tiles->matrix
+                   (update-in ((juxt :type :number) (tile-inxes candidate)) - 2)
+                   ;; m, p, sは刻子と順子を構成する
+                   ((fn [matrix]
+                      (->> (for [i (range 3) j (range 7)] [i j]) ; 8, 9, 10の順子は構成できない
+                           (reduce (fn [acc [i j]]
+                                     (let [cnt (get-in acc [i j])]
+                                       ;; まず対象の牌を0にする
+                                       ;; mod 3した数を次と次の次の牌から引く
+                                       ;; まず刻子を抜き出した後、順子を抜き出す操作に相当する
+                                       (-> acc
+                                           (assoc-in [i j] 0)
+                                           (update-in [i (inc j)] - (mod cnt 3))
+                                           (update-in [i (inc (inc j))] - (mod cnt 3)))))
+                                   matrix))))
+                   ;; zは刻子のみ
+                   ((fn [matrix]
+                      (let [i 3]
+                        (->> (for [j (range 9)] [i j])
+                             (reduce (fn [acc [i j]]
+                                       (-> acc
+                                           (update-in [i j] mod 3)))
+                                     matrix))))))]))
        (keep (fn [[pair matrix]]
                (when (->> matrix (every? (partial every? zero?))) pair)))))
 
@@ -125,24 +129,25 @@
        c.util/power-set
        (map sort-tiles)
        (map (fn [candidate-lst]
-              (let [matrix (->> candidate-lst
-                                (reduce
-                                 (fn [acc val]
-                                   (-> acc (update-in ((juxt :type :number) (tile-inxes val)) - 3)))
-                                 (tiles->matrix tiles))
-                                atom)]
-                ;; m, p, sは順子を構成する
-                (doseq [i (range 3)
-                        j (range 7)]     ; 8, 9, 10の順子は構成できない
-                  (let [cnt (get-in @matrix [i j])]
-                    (when (pos? cnt)
-                      ;; まず対象の牌を0にする
-                      ;; その数を次と次の次の牌から引く
-                      ;; 順子を抜き出す操作に相当する
-                      (swap! matrix assoc-in [i j] 0)
-                      (swap! matrix update-in [i (inc j)] - cnt)
-                      (swap! matrix update-in [i (inc (inc j))] - cnt))))
-                [candidate-lst @matrix])))
+              [candidate-lst
+               (->> candidate-lst
+                    (reduce
+                     (fn [acc val]
+                       (-> acc (update-in ((juxt :type :number) (tile-inxes val)) - 3)))
+                     (tiles->matrix tiles))
+                    ;; m, p, sは順子を構成する
+                    ((fn [matrix]
+                       (->> (for [i (range 3) j (range 7)] [i j]) ; 8, 9, 10の順子は構成できない
+                            (reduce (fn [acc [i j]]
+                                      (let [cnt (get-in acc [i j])]
+                                        ;; まず対象の牌を0にする
+                                        ;; その数を次と次の次の牌から引く
+                                        ;; 順子を抜き出す操作に相当する
+                                        (-> acc
+                                            (assoc-in [i j] 0)
+                                            (update-in [i (inc j)] - cnt)
+                                            (update-in [i (inc (inc j))] - cnt))))
+                                    matrix)))))]))
        (keep (fn [[candidate-lst matrix]]
                (when (->> matrix (every? (partial every? zero?))) candidate-lst)))))
 
