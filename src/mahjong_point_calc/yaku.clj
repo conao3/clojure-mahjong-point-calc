@@ -19,18 +19,21 @@
                        [:kantsu {:optional true} [:seqable [:seqable c.schema/tile]]]
                        [:kokushi-tiles {:optional true} [:seqable c.schema/tile]]])
 
-(defn- is-terminal-honor? [tile]
+(mx/defn ^:private terminal-honor? :- :boolean
+  [tile :- c.schema/tile]
   (let [{:keys [type number]} (c.logic/tile-info tile)]
     (or (= type c.schema/tile-type-jihai)
         (= number 1)
         (= number 9))))
 
-(defn- is-terminal? [tile]
+(mx/defn ^:private terminal? :- :boolean
+  [tile :- c.schema/tile]
   (let [{:keys [type number]} (c.logic/tile-info tile)]
     (and (not= type c.schema/tile-type-jihai)
          (or (= number 1) (= number 9)))))
 
-(defn- is-honor? [tile]
+(mx/defn ^:private honor? :- :boolean
+  [tile :- c.schema/tile]
   (let [{:keys [type]} (c.logic/tile-info tile)]
     (= type c.schema/tile-type-jihai)))
 
@@ -53,7 +56,7 @@
   "全体系列: 断么九"
   [{:keys [win-tile pair kotsu shuntsu]} :- hand-composition]
   (let [all-tiles (concat [win-tile pair] (flatten kotsu) (flatten shuntsu))]
-    (not-any? is-terminal-honor? all-tiles)))
+    (not-any? terminal-honor? all-tiles)))
 
 (mx/defn pinfu? :- :boolean
   "全体系列: 平和"
@@ -82,7 +85,7 @@
   "全体系列: 全帯幺九"
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
   (let [has-terminal-honor? (fn [tiles]
-                              (some is-terminal-honor? tiles))]
+                              (some terminal-honor? tiles))]
     (and (has-terminal-honor? [pair])
          (every? has-terminal-honor? kotsu)
          (every? has-terminal-honor? shuntsu))))
@@ -91,7 +94,7 @@
   "全体系列: 純全帯么九"
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
   (let [has-terminal? (fn [tiles]
-                        (some is-terminal? tiles))]
+                        (some terminal? tiles))]
     (and (has-terminal? [pair])
          (every? has-terminal? kotsu)
          (every? has-terminal? shuntsu))))
@@ -101,21 +104,21 @@
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
   (let [all-tiles (concat [pair] (flatten kotsu))]
     (and (empty? shuntsu)
-         (every? is-terminal-honor? all-tiles))))
+         (every? terminal-honor? all-tiles))))
 
 (mx/defn chinroutou? :- :boolean
   "全体系列: 清老頭"
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
   (let [all-tiles (concat [pair] (flatten kotsu))]
     (and (empty? shuntsu)
-         (every? is-terminal? all-tiles))))
+         (every? terminal? all-tiles))))
 
 (mx/defn tsuuiisou? :- :boolean
   "全体系列: 字一色"
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
   (let [all-tiles (concat [pair] (flatten kotsu))]
     (and (empty? shuntsu)
-         (every? is-honor? all-tiles))))
+         (every? honor? all-tiles))))
 
 (mx/defn ryuuiisou? :- :boolean
   "全体系列: 緑一色"
