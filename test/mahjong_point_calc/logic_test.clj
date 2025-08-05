@@ -93,3 +93,23 @@
            (-> "111222333p123s"
                c.logic/parse-tiles
                c.logic/get-available-kotsu))))
+
+(t/deftest is-kanchan-test
+  (t/is (= :1m
+           (c.logic/is-kanchan
+            :2m
+            (-> "345p12334m2m"
+                c.logic/parse-tiles
+                c.logic/get-available-shuntsu))))
+
+  (t/is (= nil
+           (c.logic/is-kanchan
+            :2m
+            (-> "345p12334m1m"
+                c.logic/parse-tiles
+                c.logic/get-available-shuntsu)))))
+
+(t/deftest is-penchan-test
+  (t/is (= :2m (c.logic/is-penchan :2m :2m)))
+
+  (t/is (= nil (c.logic/is-penchan :2m :3m))))

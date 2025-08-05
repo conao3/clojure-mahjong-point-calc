@@ -162,6 +162,25 @@
        (filter second)
        (map first)))
 
+(mx/defn is-kanchan :- [:maybe c.schema/tile]
+  [win-tile :- c.schema/tile
+   shuntsu-start-tiles :- [:seqable c.schema/tile]]
+  (->> shuntsu-start-tiles
+       (some (fn [s]
+               (when (= (-> win-tile
+                            tile-inxes
+                            (select-keys [:type :number])
+                            (update :number dec))
+                        (-> s tile-inxes (select-keys [:type :number])))
+                 s)))))
+
+(mx/defn is-penchan :- [:maybe c.schema/tile]
+  [win-tile :- c.schema/tile
+   pair-tile :- c.schema/tile]
+  (when (= (-> win-tile tile-inxes (select-keys [:type :number]))
+           (-> pair-tile tile-inxes (select-keys [:type :number])))
+    pair-tile))
+
 ;; (mx/defn get-all-available-mentsu :- [:seqable c.schema/tile]
 ;;   [hand :- c.schema/hand
 ;;    win-tile :- c.schema/tile]
