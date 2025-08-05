@@ -86,4 +86,10 @@
   (t/is (= [[:2p]]
            (-> "233444556m222p"
                c.logic/parse-tiles
+               c.logic/get-available-kotsu)))
+
+  ;; 三暗刻に取った方が高いが、123pの順子として取ることもできる
+  (t/is (= [[] [:1p :2p :3p]]
+           (-> "111222333p123s"
+               c.logic/parse-tiles
                c.logic/get-available-kotsu))))
