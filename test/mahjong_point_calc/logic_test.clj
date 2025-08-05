@@ -56,6 +56,17 @@
                c.logic/get-available-pair
                c.logic/sort-tiles))))
 
+(t/deftest get-available-shuntsu-test
+  (t/is (= [:1m :2m :3p]
+           (-> "345p12334m2m"
+               c.logic/parse-tiles
+               c.logic/get-available-shuntsu)))
+
+  (t/is (= nil
+           (-> "345p12334m2m2m"
+               c.logic/parse-tiles
+               c.logic/get-available-shuntsu))))
+
 (t/deftest get-available-kotsu-test
   (t/is (= [[]]
            (-> "55677m234p567s6m"

@@ -120,14 +120,36 @@
        (keep (fn [[pair matrix]]
                (when (->> matrix (every? (partial every? zero?))) pair)))))
 
+(mx/defn get-available-shuntsu :- [:maybe [:seqable c.schema/tile]]
+  [tiles :- [:seqable c.schema/tile]]
+  (-> tiles
+      tiles->matrix
+      ((fn [matrix]
+         (->> (for [i (range 3) j (range 7)] [i j])
+              (reduce (fn [[acc mat] [i j]]
+                        (let [cnt (get-in mat [i j])]
+                          [(cond-> acc
+                             (pos? cnt) (conj (inx->tile i j)))
+                           (cond-> mat
+                             ;; まず対象の牌を0にする
+                             ;; その数を次と次の次の牌から引く
+                             ;; 順子を抜き出す操作に相当する
+                             (pos? cnt) (-> (assoc-in [i j] 0)
+                                            (update-in [i (inc j)] - cnt)
+                                            (update-in [i (inc (inc j))] - cnt)))]))
+                      [[] matrix]))))
+      ((fn [[shuntsu matrix]]
+         (when (->> matrix (every? (partial every? zero?)))
+           shuntsu)))))
+
 (mx/defn get-available-kotsu :- [:seqable [:seqable c.schema/tile]]
   [tiles :- [:seqable c.schema/tile]]
   (->> tiles
        frequencies
        (keep (fn [[k v]] (when (<= 3 v) [k (quot v 3)])))
        (mapcat (fn [[k n]] (repeat n k)))
+       sort-tiles
        c.util/power-set
-       (map sort-tiles)
        (map (fn [candidate-lst]
               [candidate-lst
                (->> candidate-lst
@@ -135,21 +157,10 @@
                      (fn [acc val]
                        (-> acc (update-in ((juxt :type :number) (tile-inxes val)) - 3)))
                      (tiles->matrix tiles))
-                    ;; m, p, sは順子を構成する
-                    ((fn [matrix]
-                       (->> (for [i (range 3) j (range 7)] [i j]) ; 8, 9, 10の順子は構成できない
-                            (reduce (fn [acc [i j]]
-                                      (let [cnt (get-in acc [i j])]
-                                        ;; まず対象の牌を0にする
-                                        ;; その数を次と次の次の牌から引く
-                                        ;; 順子を抜き出す操作に相当する
-                                        (-> acc
-                                            (assoc-in [i j] 0)
-                                            (update-in [i (inc j)] - cnt)
-                                            (update-in [i (inc (inc j))] - cnt))))
-                                    matrix)))))]))
-       (keep (fn [[candidate-lst matrix]]
-               (when (->> matrix (every? (partial every? zero?))) candidate-lst)))))
+                    matrix->tiles
+                    get-available-shuntsu)]))
+       (filter second)
+       (map first)))
 
 ;; (mx/defn get-all-available-mentsu :- [:seqable c.schema/tile]
 ;;   [hand :- c.schema/hand
