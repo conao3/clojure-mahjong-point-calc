@@ -60,6 +60,12 @@
            (-> "2234455m234s234p3m"
                c.logic/parse-tiles
                c.logic/get-available-pair
+               c.logic/sort-tiles)))
+
+  (t/is (= [:2s]
+           (-> "111333m444z22999s"
+               c.logic/parse-tiles
+               c.logic/get-available-pair
                c.logic/sort-tiles))))
 
 

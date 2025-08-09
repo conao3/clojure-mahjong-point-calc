@@ -109,6 +109,13 @@
                                            (update-in [i (inc j)] - (mod cnt 3))
                                            (update-in [i (inc (inc j))] - (mod cnt 3)))))
                                    matrix))))
+                   ;; m, p, sについて、8, 9の刻子を抜き出す
+                   ((fn [matrix]
+                      (->> (for [i (range 3) j (range 7 9)] [i j])
+                           (reduce (fn [acc [i j]]
+                                     (-> acc
+                                         (update-in [i j] mod 3)))
+                                   matrix))))
                    ;; zは刻子のみ
                    ((fn [matrix]
                       (let [i 3]
