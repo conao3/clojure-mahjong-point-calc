@@ -89,3 +89,15 @@
            (-> "233444556m222p"
                c.logic/parse-tiles
                c.logic/get-available-kotsu))))
+
+(t/deftest hand-composition-test
+  (t/is (= [{:pair :6p :kotsu [] :shuntsu [:5m :2p :5s]}]
+           (-> "55677m23466p567s6m"
+               c.logic/parse-tiles
+               c.logic/hand-composition)))
+
+  (t/is (= [{:pair :2m :kotsu [] :shuntsu [:3m :2p :2s]}
+            {:pair :5m :kotsu [] :shuntsu [:2m :2p :2s]}]
+           (-> "2234455m234s234p3m"
+               c.logic/parse-tiles
+               c.logic/hand-composition))))

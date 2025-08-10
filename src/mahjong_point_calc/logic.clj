@@ -169,6 +169,26 @@
        (filter second)
        (map first)))
 
+(mx/defn hand-composition :- [:seqable
+                              [:map
+                               [:pair c.schema/tile]
+                               [:kotsu [:seqable c.schema/tile]]
+                               [:shuntsu [:seqable c.schema/tile]]]]
+  [tiles :- [:seqable c.schema/tile]]
+  (for [pair (-> tiles get-available-pair sort-tiles)
+        :let [tiles (-> tiles
+                        tiles->matrix
+                        (update-in ((juxt :type :number) (tile-inxes pair)) - 2)
+                        matrix->tiles)]
+        kotsu (-> tiles get-available-kotsu)
+        :let [tiles (->> kotsu
+                         (reduce (fn [acc val]
+                                   (-> acc
+                                       (update-in ((juxt :type :number) (tile-inxes val)) - 3)))
+                                 (-> tiles tiles->matrix))
+                         matrix->tiles)]]
+    {:pair pair :kotsu kotsu :shuntsu (-> tiles get-available-shuntsu)}))
+
 (mx/defn is-kanchan :- [:maybe c.schema/tile]
   [win-tile :- c.schema/tile
    shuntsu-start-tiles :- [:seqable c.schema/tile]]
