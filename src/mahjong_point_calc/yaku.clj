@@ -14,10 +14,8 @@
 (def hand-composition [:map
                        [:win-tile c.schema/tile]
                        [:pair c.schema/tile]
-                       [:kotsu [:seqable [:seqable c.schema/tile]]]
-                       [:shuntsu [:seqable [:seqable c.schema/tile]]]
-                       [:kantsu {:optional true} [:seqable [:seqable c.schema/tile]]]
-                       [:kokushi-tiles {:optional true} [:seqable c.schema/tile]]])
+                       [:kotsu [:seqable c.schema/tile]]
+                       [:shuntsu [:seqable c.schema/tile]]])
 
 (mx/defn ^:private terminal-honor? :- :boolean
   [tile :- c.schema/tile]
