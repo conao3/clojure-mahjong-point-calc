@@ -37,8 +37,8 @@
 
 (mx/defn toitoi? :- :boolean
   "基本系列: 対々和"
-  [{:keys [_win-tile _pair _kotsu shuntsu]} :- hand-composition]
-  (empty? shuntsu))
+  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
+  (and (seq kotsu) (empty? shuntsu)))
 
 (mx/defn sanankou? :- :boolean
   "基本系列: 三暗刻"

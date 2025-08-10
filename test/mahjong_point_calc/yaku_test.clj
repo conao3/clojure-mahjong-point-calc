@@ -1,17 +1,21 @@
 (ns mahjong-point-calc.yaku-test
   (:require
    [clojure.test :as t]
-   [mahjong-point-calc.yaku :as c.yaku]))
+   [mahjong-point-calc.yaku :as c.yaku]
+   [mahjong-point-calc.logic :as c.logic]))
 
 (t/deftest toitoi?-test
-  (t/is (true? (c.yaku/toitoi? {:win-tile :7p
-                                :pair :4s
-                                :kotsu [[:1m :1m :1m] [:4s :4s :4s] [:2z :2z :2z] [:8p :8p :8p]]
-                                :shuntsu []})))
-  (t/is (false? (c.yaku/toitoi? {:win-tile :7p
-                                 :pair :4s
-                                 :kotsu [[:1m :1m :1m] [:4s :4s :4s]]
-                                 :shuntsu [[:2m :3m :4m]]}))))
+  (let [tiles (-> "111333m444z22999s" c.logic/parse-tiles)
+        win-tile :2s
+        hand-composition {:pair :2s :kotsu [:1m :3m :9s :4z] :shuntsu []}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (true? (c.yaku/toitoi? (assoc hand-composition :win-tile win-tile))))))
+
+(ns mahjong-point-calc.yaku-test.old
+  (:require
+   [clojure.test :as t]
+   [mahjong-point-calc.yaku :as c.yaku]))
 
 (t/deftest sanankou?-test
   (t/is (true? (c.yaku/sanankou? {:win-tile :7p
