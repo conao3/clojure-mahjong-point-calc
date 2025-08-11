@@ -50,3 +50,10 @@
 (t/deftest power-set-test
   (t/is (= [[] [:5m] [:6m] [:5m :6m]]
            (c.util/power-set [:5m :6m]))))
+
+(t/deftest any?-test
+  (t/is (= true
+           (c.util/any? even? [1 3 5 6 7])))
+
+  (t/is (= false
+           (c.util/any? even? [1 3 5 7]))))

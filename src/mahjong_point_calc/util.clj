@@ -1,4 +1,5 @@
-(ns mahjong-point-calc.util 
+(ns mahjong-point-calc.util
+  (:refer-clojure :exclude [any?])
   (:require
    [malli.experimental :as mx]))
 
@@ -27,3 +28,6 @@
   [coll :- [:seqable :any]]
   (->> coll
        (reduce (fn [acc x] (into acc (map (lpartial conj x) acc))) [[]])))
+
+(def any?
+  (comp some? some))
