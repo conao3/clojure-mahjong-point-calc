@@ -2,7 +2,8 @@
   (:require
    [mahjong-point-calc.schema :as c.schema]
    [mahjong-point-calc.logic :as c.logic]
-   [malli.experimental :as mx]))
+   [malli.experimental :as mx]
+   [mahjong-point-calc.util :as c.util]))
 
 ;; 以下の役は別途確認する
 ;; 基本系列: 三槓子
@@ -36,25 +37,34 @@
     (= type c.schema/tile-type-jihai)))
 
 (mx/defn toitoi? :- :boolean
-  "基本系列: 対々和"
+  "基本系列: 対々和
+1つ以上の刻子があり、順子はない"
   [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
   (and (seq kotsu) (empty? shuntsu)))
 
 (mx/defn sanankou? :- :boolean
-  "基本系列: 三暗刻"
+  "基本系列: 三暗刻
+3つ以上の刻子があること; 面前のみ"
   [{:keys [_win-tile _pair kotsu _shuntsu]} :- hand-composition]
   (>= (count kotsu) 3))
 
 (mx/defn suuankou? :- :boolean
-  "基本系列: 四暗刻"
+  "基本系列: 四暗刻
+4つ以上の刻子があること; 面前のみ"
   [{:keys [_win-tile _pair kotsu _shuntsu]} :- hand-composition]
   (>= (count kotsu) 4))
 
 (mx/defn tanyao? :- :boolean
-  "全体系列: 断么九"
-  [{:keys [win-tile pair kotsu shuntsu]} :- hand-composition]
-  (let [all-tiles (concat [win-tile pair] (flatten kotsu) (flatten shuntsu))]
-    (not-any? terminal-honor? all-tiles)))
+  "全体系列: 断么九
+手牌が全て数牌で、2から8のみ"
+  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
+  (->> (concat kotsu shuntsu (->> shuntsu
+                                  (map #(-> %
+                                            c.logic/tile-inxes
+                                            ((fn [{:keys [type number]}]
+                                               (c.logic/inx->tile type (+ number 2))))))))
+       (map c.logic/tile-inxes)
+       (every? #(and (not= 3 (:type %)) (<= 2 (:number %) 8)))))
 
 (mx/defn pinfu? :- :boolean
   "全体系列: 平和"

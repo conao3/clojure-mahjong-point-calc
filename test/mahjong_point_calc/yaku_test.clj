@@ -5,12 +5,43 @@
    [mahjong-point-calc.logic :as c.logic]))
 
 (t/deftest toitoi?-test
-  (let [tiles (-> "111333m444z22999s" c.logic/parse-tiles)
+  (let [tiles (-> "111333m444z999s22s" c.logic/parse-tiles)
         win-tile :2s
         hand-composition {:pair :2s :kotsu [:1m :3m :9s :4z] :shuntsu []}]
     (t/is (= (-> hand-composition vector)
              (-> tiles c.logic/hand-composition)))
     (t/is (true? (c.yaku/toitoi? (assoc hand-composition :win-tile win-tile))))))
+
+(t/deftest sanankou?-test
+  (let [tiles (-> "333m777p222s123m44p" c.logic/parse-tiles)
+        win-tile :4p
+        hand-composition {:pair :4p :kotsu [:3m :7p :2s] :shuntsu [:1m]}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (true? (c.yaku/sanankou? (assoc hand-composition :win-tile win-tile))))))
+
+(t/deftest suuankou?-test
+  (let [tiles (-> "333m777p222s111z44p" c.logic/parse-tiles)
+        win-tile :4p
+        hand-composition {:pair :4p :kotsu [:3m :7p :2s :1z] :shuntsu []}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (true? (c.yaku/suuankou? (assoc hand-composition :win-tile win-tile))))))
+
+(t/deftest tanyao?-test
+  (let [tiles (-> "345m555s333p678p22m" c.logic/parse-tiles)
+        win-tile :2m
+        hand-composition {:pair :2m :kotsu [:3p :5s] :shuntsu [:3m :6p]}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (true? (c.yaku/tanyao? (assoc hand-composition :win-tile win-tile)))))
+
+  (let [tiles (-> "345m555s333z678p22m" c.logic/parse-tiles)
+        win-tile :2m
+        hand-composition {:pair :2m :kotsu [:5s :3z] :shuntsu [:3m :6p]}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (false? (c.yaku/tanyao? (assoc hand-composition :win-tile win-tile))))))
 
 (ns mahjong-point-calc.yaku-test.old
   (:require
