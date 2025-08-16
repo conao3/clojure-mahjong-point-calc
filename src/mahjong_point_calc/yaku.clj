@@ -83,9 +83,10 @@
                      (->> shuntsu (map c.logic/tile-info) (c.util/any? #(= (:number win-tile-info) (+ (:number %) 2))))))))))
 
 (mx/defn honitsu? :- :boolean
-  "全体系列: 混一色"
-  [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
-  (let [all-tiles (concat [pair] (flatten kotsu) (flatten shuntsu))
+  "全体系列: 混一色
+1種類の数牌と字牌で構成されるとき"
+  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
+  (let [all-tiles (concat kotsu shuntsu)
         types (set (map #(:type (c.logic/tile-info %)) all-tiles))
         number-types (disj types c.schema/tile-type-jihai)]
     (and (= (count number-types) 1)
