@@ -63,14 +63,24 @@
                                             c.logic/tile-inxes
                                             ((fn [{:keys [type number]}]
                                                (c.logic/inx->tile type (+ number 2))))))))
-       (map c.logic/tile-inxes)
-       (every? #(and (not= 3 (:type %)) (<= 2 (:number %) 8)))))
+       (map c.logic/tile-info)
+       (every? #(and (not= c.schema/tile-type-jihai (:type %)) (<= 2 (:number %) 8)))))
 
 (mx/defn pinfu? :- :boolean
-  "全体系列: 平和"
-  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
-  (and (empty? kotsu)
-       (= (count shuntsu) 4)))
+  "全体系列: 平和
+手牌が全て順子で、雀頭が役牌ではない、両面待ち"
+  [{:keys [win-tile pair kotsu shuntsu yakuhai?]} :- [:map
+                                                      [:win-tile c.schema/tile]
+                                                      [:pair c.schema/tile]
+                                                      [:kotsu [:seqable c.schema/tile]]
+                                                      [:shuntsu [:seqable c.schema/tile]]
+                                                      [:yakuhai? ifn?]]]
+  (let [win-tile-info (-> win-tile c.logic/tile-info)]
+    (and (empty? kotsu)
+         (seq shuntsu)
+         (not (yakuhai? pair))
+         ((fn [] (or (->> shuntsu (map c.logic/tile-info) (c.util/any? #(= (:number win-tile-info) (:number %))))
+                     (->> shuntsu (map c.logic/tile-info) (c.util/any? #(= (:number win-tile-info) (+ (:number %) 2))))))))))
 
 (mx/defn honitsu? :- :boolean
   "全体系列: 混一色"

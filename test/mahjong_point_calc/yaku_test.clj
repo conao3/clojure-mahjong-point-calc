@@ -43,6 +43,16 @@
              (-> tiles c.logic/hand-composition)))
     (t/is (false? (c.yaku/tanyao? (assoc hand-composition :win-tile win-tile))))))
 
+(t/deftest pinfu?-test
+  (let [tiles (-> "345m456s789p234p11m" c.logic/parse-tiles)
+        win-tile :2p
+        hand-composition {:pair :1m :kotsu [] :shuntsu [:3m :2p :7p :4s]}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (true? (c.yaku/pinfu? (assoc hand-composition
+                                       :win-tile win-tile
+                                       :yakuhai? #{:1z :2z :3z :4z :5z :6z :7z}))))))
+
 (ns mahjong-point-calc.yaku-test.old
   (:require
    [clojure.test :as t]
