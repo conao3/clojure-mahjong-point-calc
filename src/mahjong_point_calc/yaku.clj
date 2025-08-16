@@ -57,12 +57,12 @@
 (mx/defn tanyao? :- :boolean
   "全体系列: 断么九
 手牌が全て数牌で、2から8のみ"
-  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
-  (->> (concat kotsu shuntsu (->> shuntsu
-                                  (map #(-> %
-                                            c.logic/tile-inxes
-                                            ((fn [{:keys [type number]}]
-                                               (c.logic/inx->tile type (+ number 2))))))))
+  [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
+  (->> (concat [pair] kotsu shuntsu (->> shuntsu
+                                         (map #(-> %
+                                                   c.logic/tile-inxes
+                                                   ((fn [{:keys [type number]}]
+                                                      (c.logic/inx->tile type (+ number 2))))))))
        (map c.logic/tile-info)
        (every? #(and (not= c.schema/tile-type-jihai (:type %)) (<= 2 (:number %) 8)))))
 
@@ -85,8 +85,8 @@
 (mx/defn honitsu? :- :boolean
   "全体系列: 混一色
 1種類の数牌と字牌で構成されるとき"
-  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
-  (let [all-tiles (concat kotsu shuntsu)
+  [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
+  (let [all-tiles (concat [pair] kotsu shuntsu)
         types (set (map #(:type (c.logic/tile-info %)) all-tiles))
         number-types (disj types c.schema/tile-type-jihai)]
     (and (= (count number-types) 1)
@@ -95,8 +95,8 @@
 (mx/defn chinitsu? :- :boolean
   "全体系列: 清一色
 1種類の数牌のみで構成されるとき"
-  [{:keys [_win-tile _pair kotsu shuntsu]} :- hand-composition]
-  (let [all-tiles (concat kotsu shuntsu)
+  [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
+  (let [all-tiles (concat [pair] kotsu shuntsu)
         types (set (map #(:type (c.logic/tile-info %)) all-tiles))]
     (and (= (count types) 1)
          (not (contains? types c.schema/tile-type-jihai)))))
