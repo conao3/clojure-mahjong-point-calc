@@ -1,6 +1,7 @@
 (ns build
   (:require
-   [clojure.tools.build.api :as b]))
+    [clojure.tools.build.api :as b]))
+
 
 (def lib 'mahjong-point-calc/core)
 (def main 'mahjong-point-calc.mahjong-point-calc)
@@ -10,7 +11,9 @@
 (def uber-file (format "target/%s-standalone.jar" (namespace lib)))
 (def basis (delay (b/create-basis {:project "deps.edn"})))
 
-(defn jar [_]
+
+(defn jar
+  [_]
   (b/write-pom {:class-dir class-dir
                 :lib lib
                 :version version
@@ -21,7 +24,9 @@
   (b/jar {:class-dir class-dir
           :jar-file jar-file}))
 
-(defn uber [_]
+
+(defn uber
+  [_]
   (b/copy-dir {:src-dirs ["src" "resources"]
                :target-dir class-dir})
   (b/compile-clj {:basis @basis
