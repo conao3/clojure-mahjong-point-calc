@@ -1,8 +1,7 @@
 (ns mahjong-point-calc.util-test
   (:require
-    [clojure.test :as t]
-    [mahjong-point-calc.util :as c.util]))
-
+   [clojure.test :as t]
+   [mahjong-point-calc.util :as c.util]))
 
 (t/deftest find-value-test
   (t/is (= {:char \m :value :manzu}
@@ -21,7 +20,6 @@
                               :char
                               \q))))
 
-
 (t/deftest find-value-index-test
   (t/is (= [0 {:char \m :value :manzu}]
            (c.util/find-value-index [{:char \m :value :manzu}
@@ -39,13 +37,11 @@
                                     :char
                                     \q))))
 
-
 (t/deftest lpartial-test
   (t/is (= {:type 'a :value 2}
            ((c.util/lpartial update :value inc)
             {:type 'a
              :value 1}))))
-
 
 (t/deftest power-set-test
   (t/is (= [[] [:5m] [:6m] [:5m :6m]]
