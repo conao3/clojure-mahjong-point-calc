@@ -69,6 +69,14 @@
              (-> tiles c.logic/hand-composition)))
     (t/is (true? (c.yaku/chinitsu? (assoc hand-composition :win-tile win-tile))))))
 
+(t/deftest chanta?-test
+  (let [tiles (-> "123m789p999s11z666z" c.logic/parse-tiles)
+        win-tile :6z
+        hand-composition {:pair :1z :kotsu [:9s :6z] :shuntsu [:1m :7p]}]
+    (t/is (= (-> hand-composition vector)
+             (-> tiles c.logic/hand-composition)))
+    (t/is (true? (c.yaku/chanta? (assoc hand-composition :win-tile win-tile))))))
+
 (ns mahjong-point-calc.yaku-test.old
   (:require
    [clojure.test :as t]

@@ -36,6 +36,15 @@
   (let [{:keys [type]} (c.logic/tile-info tile)]
     (= type c.schema/tile-type-jihai)))
 
+(mx/defn expand-shuntsu :- [:seqable c.schema/tile]
+  [tile :- c.schema/tile]
+  (let [tile-inxes (-> tile c.logic/tile-inxes)]
+    (->> (range 3)
+         (map (fn [i]
+                (update tile-inxes :number + i)))
+         (map (fn [inxes]
+                (c.logic/inx->tile (:type inxes) (:number inxes)))))))
+
 (mx/defn toitoi? :- :boolean
   "基本系列: 対々和
 1つ以上の刻子があり、順子はない"
@@ -104,20 +113,16 @@
 (mx/defn chanta? :- :boolean
   "全体系列: 全帯幺九"
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
-  (let [has-terminal-honor? (fn [tiles]
-                              (some terminal-honor? tiles))]
-    (and (has-terminal-honor? [pair])
-         (every? has-terminal-honor? kotsu)
-         (every? has-terminal-honor? shuntsu))))
+  (and (terminal-honor? pair)
+       (every? terminal-honor? kotsu)
+       (every? #(some terminal-honor? (expand-shuntsu %)) shuntsu)))
 
 (mx/defn junchan? :- :boolean
   "全体系列: 純全帯么九"
   [{:keys [_win-tile pair kotsu shuntsu]} :- hand-composition]
-  (let [has-terminal? (fn [tiles]
-                        (some terminal? tiles))]
-    (and (has-terminal? [pair])
-         (every? has-terminal? kotsu)
-         (every? has-terminal? shuntsu))))
+  (and (terminal? pair)
+       (every? terminal? kotsu)
+       (every? #(some terminal? (expand-shuntsu %)) shuntsu)))
 
 (mx/defn honroutou? :- :boolean
   "全体系列: 混老頭"
